@@ -20,24 +20,6 @@
 			  interpolate: /\{\{(.+?)\}\}/g
 			};
 
-			var muppetsData = {
-			  "total": 2,
-			  "page": 1,
-			  "perPage": 10,
-			  "muppets": [
-				{
-				  "id": 1,
-				  "name": "Kermit",
-				  "occupation": "being green"
-				},
-				{
-				  "id": 2,
-				  "name": "Gonzo",
-				  "occupation": "plumber"
-				}
-			  ]
-			};
-
 			var MuppetModel = Backbone.Model.extend({
 				defaults: {
 					id: null,
@@ -46,23 +28,17 @@
 				}
 			});
 
-			/*var MuppetsCollection = Backbone.Collection.extend({
-				url: '/muppets.json',
+			var MuppetsCollection = Backbone.Collection.extend({
+				url: 'data/muppets.json',
 				model: MuppetModel,
 				parse: function(response) {
-					response.muppets;
-				}
+					return response.muppets;
+				},
+				comparator: 'id'
 			});
 
 			var muppets = new MuppetsCollection();
-			muppets.fetch().then(function(){
-				console.log(muppets.length);
-			});
-			*/
-
-			var muppets = new Backbone.Collection(muppetsData.muppets, {
-				model: MuppetModel
-			});
+			muppets.fetch();
 
 			var MuppetsListView = Backbone.View.extend({
 				el: '#muppets-list',
