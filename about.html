@@ -1,0 +1,83 @@
+<html>
+	<head>
+		<title>About backbone</title>
+	</head>
+	<body>
+		<ul id="muppets-list">
+			
+		</ul>
+
+		<a href="index.html">Index Page</a>
+
+		<script type="text/template" id="muppet-item-tmpl">
+		  <p><a href="/muppets/{{ id }}">{{ name }}</a></p>
+		  <p>Job: <i>{{ occupation }}</i></p>
+		  <button class="remove">x</button>
+		</script>
+		<script type="text/javascript" src="assets/js/jquery-1.7.2.js"></script>
+		<script type="text/javascript" src="assets/js/underscore.js"></script>
+		<script type="text/javascript" src="assets/js/backbone.js"></script>
+		<script type="text/javascript">
+			_.templateSettings = {
+			  interpolate: /\{\{(.+?)\}\}/g
+			};
+
+			var MuppetModel = Backbone.Model.extend({
+				defaults: {
+					id: null,
+					name: null,
+					occupation: null
+				}
+			});
+
+			var MuppetsCollection = Backbone.Collection.extend({
+				url: 'data/muppets.json',
+				model: MuppetModel,
+				parse: function(response) {
+					return response.muppets;
+				},
+				comparator: 'id'
+			});
+
+			var muppets = new MuppetsCollection();
+			muppets.fetch();
+
+			var MuppetsListView = Backbone.View.extend({
+				el: '#muppets-list',
+				initialize: function() {
+					this.listenTo(this.collection, 'sync', this.render);
+					this.render();
+				},
+				render: function() {
+					var that = this;
+					this.$el.empty();
+					this.collection.each(function(model){
+						var item = new MuppetsListItemView({model: model});
+						that.$el.append(item.render().$el);
+					});
+
+					return this;
+				}
+			});
+
+			var MuppetsListItemView = Backbone.View.extend({
+				tagName: 'li',
+				className: 'muppet',
+				template: _.template($('#muppet-item-tmpl').html()),
+
+				render: function() {
+					var html = this.template(this.model.toJSON());
+					this.$el.html(html);
+					return this;
+				}
+			});
+
+			var muppetsList = new MuppetsListView({
+				collection: muppets
+			});
+
+			muppetsList.$el.append('<li>About backbone</li>');
+		</script>
+		<script src="assets/js/router.js"></script>
+	</body>
+</html>
